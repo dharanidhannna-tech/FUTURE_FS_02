@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LeadFlow CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --surface3: #222736;
+    --border: #2a2f3d;
+    --border2: #363d52;
+    --accent: #e8c547;
+    --accent2: #f0d870;
+    --text: #e8eaf2;
+    --text2: #8b91a8;
+    --text3: #555d78;
+    --green: #3dd68c;
+    --green-bg: #0f2d1e;
+    --blue: #5b8def;
+    --blue-bg: #0f1e3a;
+    --orange: #f0874a;
+    --orange-bg: #2d1a0a;
+    --red: #e8566a;
+    --red-bg: #2d0f15;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Login */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    position: relative;
+  }
+  .login-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 20%, rgba(232,197,71,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(91,141,239,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 44px;
+    width: 400px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 32px;
+  }
+  .login-logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .login-logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--text);
+  }
+  .login-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: var(--text);
+    margin-bottom: 6px;
+  }
+  .login-sub { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text3); }
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:active { transform: scale(0.98); }
+  .login-hint { color: var(--text3); font-size: 12px; margin-top: 14px; text-align: center; }
+  .login-error { color: var(--red); font-size: 13px; margin-top: 10px; text-align: center; }
+
+  /* Layout */
+  .app-layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 24px 16px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; padding: 0 8px; }
+  .sidebar-logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .sidebar-logo-text { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .sidebar-section { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); padding: 0 8px; margin-bottom: 8px; margin-top: 20px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px; font-weight: 500;
+    color: var(--text2);
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(232,197,71,0.12); color: var(--accent); }
+  .nav-item-icon { font-size: 17px; width: 22px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #0d0f14; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; }
+  .sidebar-avatar { width: 32px; height: 32px; background: var(--accent); color: #0d0f14; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+  .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sidebar-role { font-size: 11px; color: var(--text3); }
+  .logout-btn { margin-left: auto; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+  .logout-btn:hover { color: var(--red); }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-title { font-family: 'DM Serif Display', serif; font-size: 22px; flex: 1; }
+  .topbar-search {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px 8px 36px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 220px;
+    transition: border 0.2s;
+    position: relative;
+  }
+  .topbar-search:focus { border-color: var(--accent); }
+  .search-wrap { position: relative; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+  .btn-add {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn-add:hover { background: var(--accent2); }
+  .btn-add:active { transform: scale(0.97); }
+
+  /* Content */
+  .content { padding: 28px; flex: 1; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .stat-card.yellow::before { background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.orange::before { background: var(--orange); }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--text); line-height: 1; margin-bottom: 6px; }
+  .stat-sub { font-size: 12px; color: var(--text3); }
+
+  /* Filter Bar */
+  .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+  .filter-btn.active { background: rgba(232,197,71,0.12); border-color: var(--accent); color: var(--accent); }
+  .filter-count { display: inline-block; background: var(--surface3); color: var(--text3); font-size: 11px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+  .filter-btn.active .filter-count { background: rgba(232,197,71,0.2); color: var(--accent); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .lead-name { font-weight: 600; }
+  .lead-email { color: var(--text2); font-size: 13px; margin-top: 2px; }
+  .source-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px; font-weight: 500;
+    color: var(--text2);
+  }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px; font-weight: 600;
+  }
+  .status-new { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,141,239,0.25); }
+  .status-contacted { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(240,135,74,0.25); }
+  .status-converted { background: var(--green-bg); color: var(--green); border: 1px solid rgba(61,214,140,0.25); }
+  .status-lost { background: var(--red-bg); color: var(--red); border: 1px solid rgba(232,86,106,0.25); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .action-btns { display: flex; gap: 6px; }
+  .icon-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .date-text { font-size: 12px; color: var(--text3); }
+  .empty-state { padding: 60px; text-align: center; color: var(--text3); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    width: 540px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s ease both;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+  .modal-header {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; flex: 1; }
+  .modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; padding: 4px; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 22px 24px; }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px;
+  }
+  .btn-ghost {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 18px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+  .btn-save {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-save:hover { background: var(--accent2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b91a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .form-select:focus { border-color: var(--accent); }
+  .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+    resize: vertical;
+    min-height: 90px;
+  }
+  .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea::placeholder { color: var(--text3); }
+
+  /* Detail Panel */
+  .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+  .detail-main { display: flex; flex-direction: column; gap: 20px; }
+  .detail-aside { display: flex; flex-direction: column; gap: 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title { font-weight: 600; font-size: 14px; flex: 1; }
+  .card-body { padding: 20px; }
+  .info-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-item { flex: 1; }
+  .info-key { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+  .info-val { font-size: 14px; color: var(--text); }
+  .notes-list { display: flex; flex-direction: column; gap: 12px; }
+  .note-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .note-text { font-size: 13px; color: var(--text); margin-bottom: 6px; line-height: 1.5; }
+  .note-meta { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 8px; }
+  .note-add-form { display: flex; gap: 8px; margin-top: 14px; }
+  .note-add-form textarea {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: none;
+    min-height: 60px;
+    transition: border 0.2s;
+  }
+  .note-add-form textarea:focus { border-color: var(--accent); }
+  .btn-note {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background 0.2s;
+  }
+  .btn-note:hover { background: var(--accent2); }
+  .status-select-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .status-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    color: var(--text2);
+    transition: all 0.15s;
+  }
+  .status-option:hover { border-color: var(--border2); }
+  .status-option.active { color: var(--text); }
+  .status-option.active.new { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); }
+  .status-option.active.contacted { border-color: var(--orange); background: var(--orange-bg); color: var(--orange); }
+  .status-option.active.converted { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .status-option.active.lost { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: none;
+    color: var(--text2); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    padding: 0;
+    transition: color 0.15s;
+    margin-bottom: 20px;
+  }
+  .back-btn:hover { color: var(--text); }
+  .delete-btn {
+    background: var(--red-bg);
+    border: 1px solid rgba(232,86,106,0.25);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--red);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .delete-btn:hover { background: rgba(232,86,106,0.2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Toast */
+  .toast-wrap {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 999;
+  }
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.25s ease;
+    min-width: 240px;
+  }
+  @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+  .toast.success { border-left: 3px solid var(--green); }
+  .toast.info { border-left: 3px solid var(--blue); }
+  .toast.error { border-left: 3px solid var(--red); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ── Simulated DB (localStorage-backed) ──────────────────────────
+const DB_KEY = 'crm_leads_v1';
+const USER = { username: 'admin', password: 'admin123', name: 'Admin User', role: 'Super Admin' };
+
+const SOURCES = ['Website Form','Referral','Cold Email','LinkedIn','Twitter','Walk-in','Other'];
+const STATUSES = ['new','contacted','converted','lost'];
+
+function loadLeads() {
+  try {
+    const d = localStorage.getItem(DB_KEY);
+    return d ? JSON.parse(d) : seedLeads();
+  } catch { return seedLeads(); }
+}
+function saveLeads(leads) {
+  localStorage.setItem(DB_KEY, JSON.stringify(leads));
+}
+function seedLeads() {
+  const leads = [
+    { id: '1', name: 'Priya Sharma', email: 'priya@example.com', phone: '+91 98765 43210', company: 'TechVision Ltd', source: 'Website Form', status: 'new', notes: [{ id: 'n1', text: 'Interested in enterprise plan. Wants demo by Friday.', createdAt: new Date(Date.now()-86400000*2).toISOString() }], createdAt: new Date(Date.now()-86400000*5).toISOString() },
+    { id: '2', name: 'Rahul Mehta', email: 'rahul@startup.io', phone: '+91 87654 32109', company: 'Startup.io', source: 'LinkedIn', status: 'contacted', notes: [{ id: 'n2', text: 'Sent proposal deck. Waiting for feedback.', createdAt: new Date(Date.now()-86400000).toISOString() }], createdAt: new Date(Date.now()-86400000*8).toISOString() },
+    { id: '3', name: 'Anita Reddy', email: 'anita.r@globalcorp.com', phone: '+91 76543 21098', company: 'GlobalCorp', source: 'Referral', status: 'converted', notes: [], createdAt: new Date(Date.now()-86400000*12).toISOString() },
+    { id: '4', name: 'Vijay Kumar', email: 'v.kumar@vkbiz.in', phone: '+91 65432 10987', company: 'VK Business', source: 'Cold Email', status: 'lost', notes: [{ id: 'n4', text: 'Went with competitor pricing.', createdAt: new Date(Date.now()-86400000*3).toISOString() }], createdAt: new Date(Date.now()-86400000*15).toISOString() },
+    { id: '5', name: 'Sneha Iyer', email: 'sneha@designstudio.co', phone: '+91 54321 09876', company: 'Design Studio', source: 'Twitter', status: 'new', notes: [], createdAt: new Date(Date.now()-86400000).toISOString() },
+    { id: '6', name: 'Arjun Nair', email: 'arjun@nairgroup.com', phone: '+91 43210 98765', company: 'Nair Group', source: 'Website Form', status: 'contacted', notes: [{ id: 'n6', text: 'Follow up call scheduled for Monday.', createdAt: new Date(Date.now()-3600000*5).toISOString() }], createdAt: new Date(Date.now()-86400000*3).toISOString() },
+  ];
+  saveLeads(leads);
+  return leads;
+}
+
+// ── Utilities ────────────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+function fmtTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) + ', ' + fmtDate(iso);
+}
+function statusLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ── Toast ────────────────────────────────────────────────────────
+function Toast({ toasts }) {
+  return (
+    <div className="toast-wrap">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast ${t.type}`}>
+          <span>{t.type==='success'?'✓':t.type==='error'?'✕':'ℹ'}</span>
+          {t.msg}
+        </div>
+      ))}
+    </div>
+  );
+}
+function useToast() {
+  const [toasts, setToasts] = useState([]);
+  const push = useCallback((msg, type='success') => {
+    const id = uid();
+    setToasts(p => [...p, {id, msg, type}]);
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3000);
+  }, []);
+  return { toasts, push };
+}
+
+// ── Login ────────────────────────────────────────────────────────
+function Login({ onLogin }) {
+  const [u, setU] = useState('');
+  const [p, setP] = useState('');
+  const [err, setErr] = useState('');
+  function handle(e) {
+    e.preventDefault();
+    if (u === USER.username && p === USER.password) { onLogin(); }
+    else { setErr('Invalid credentials. Try admin / admin123'); }
+  }
+  return (
+    <div className="login-wrap">
+      <div className="login-bg" />
+      <div className="login-card">
+        <div className="login-logo">
+          <div className="login-logo-icon">⚡</div>
+          <span className="login-logo-text">LeadFlow</span>
+        </div>
+        <div className="login-title">Welcome back</div>
+        <div className="login-sub">Sign in to your CRM dashboard</div>
+        <form onSubmit={handle}>
+          <div className="form-group">
+            <label className="form-label">Username</label>
+            <input className="form-input" value={u} onChange={e=>setU(e.target.value)} placeholder="admin" autoFocus />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input className="form-input" type="password" value={p} onChange={e=>setP(e.target.value)} placeholder="••••••••" />
+          </div>
+          <button className="btn-primary" type="submit">Sign In →</button>
+          {err && <div className="login-error">{err}</div>}
+        </form>
+        <div className="login-hint">Hint: admin / admin123</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Add/Edit Modal ───────────────────────────────────────────────
+function LeadModal({ lead, onSave, onClose }) {
+  const [form, setForm] = useState(lead || { name:'', email:'', phone:'', company:'', source:'Website Form', status:'new' });
+  function set(k,v) { setForm(p => ({...p, [k]:v})); }
+  function submit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim()) return;
+    onSave(form);
+  }
+  return (
+    <div className="modal-backdrop" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <span className="modal-title">{lead ? 'Edit Lead' : 'Add New Lead'}</span>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Full Name *</label>
+                <input className="form-input" value={form.name} onChange={e=>set('name',e.target.value)} placeholder="Jane Doe" required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Email *</label>
+                <input className="form-input" type="email" value={form.email} onChange={e=>set('email',e.target.value)} placeholder="jane@example.com" required />
+              </div>
+            </div>
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Phone</label>
+                <input className="form-input" value={form.phone} onChange={e=>set('phone',e.target.value)} placeholder="+91 99999 00000" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Company</label>
+                <input className="form-input" value={form.company} onChange={e=>set('company',e.target.value)} placeholder="Acme Corp" />
+              </div>
+            </div>
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Source</label>
+                <select className="form-select" value={form.source} onChange={e=>set('source',e.target.value)}>
+                  {SOURCES.map(s => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Status</label>
+                <select className="form-select" value={form.status} onChange={e=>set('status',e.target.value)}>
+                  {STATUSES.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn-save">{lead ? 'Save Changes' : 'Add Lead'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Status Badge ─────────────────────────────────────────────────
+function StatusBadge({ status }) {
+  return (
+    <span className={`status-badge status-${status}`}>
+      <span className="status-dot" />
+      {statusLabel(status)}
+    </span>
+  );
+}
+
+// ── Lead Detail View ─────────────────────────────────────────────
+function LeadDetail({ lead, onUpdate, onBack, onDelete, push }) {
+  const [noteText, setNoteText] = useState('');
+  const [showEdit, setShowEdit] = useState(false);
+
+  function updateStatus(s) {
+    const updated = {...lead, status: s};
+    onUpdate(updated);
+    push(`Status updated to ${statusLabel(s)}`, 'info');
+  }
+  function addNote() {
+    if (!noteText.trim()) return;
+    const note = { id: uid(), text: noteText.trim(), createdAt: new Date().toISOString() };
+    const updated = {...lead, notes: [...(lead.notes||[]), note]};
+    onUpdate(updated);
+    setNoteText('');
+    push('Note added', 'success');
+  }
+  function deleteNote(nid) {
+    const updated = {...lead, notes: lead.notes.filter(n=>n.id!==nid)};
+    onUpdate(updated);
+    push('Note removed', 'info');
+  }
+  function handleEdit(form) {
+    onUpdate({...lead, ...form});
+    setShowEdit(false);
+    push('Lead updated', 'success');
+  }
+  function handleDelete() {
+    if (confirm(`Delete lead "${lead.name}"?`)) {
+      onDelete(lead.id);
+      onBack();
+      push('Lead deleted', 'error');
+    }
+  }
+
+  return (
+    <div>
+      {showEdit && <LeadModal lead={lead} onSave={handleEdit} onClose={()=>setShowEdit(false)} />}
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
+        <button className="back-btn" onClick={onBack}>← Back to Leads</button>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn-ghost" onClick={()=>setShowEdit(true)}>✎ Edit</button>
+          <button className="delete-btn" onClick={handleDelete}>🗑 Delete</button>
+        </div>
+      </div>
+      <div className="detail-layout">
+        <div className="detail-main">
+          {/* Info Card */}
+          <div className="card">
+            <div className="card-head">
+              <div style={{width:36,height:36,borderRadius:'50%',background:'var(--accent)',color:'#0d0f14',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:15}}>
+                {lead.name[0].toUpperCase()}
+              </div>
+              <div>
+                <div className="card-title" style={{fontSize:17}}>{lead.name}</div>
+                <div style={{fontSize:12,color:'var(--text3)'}}>{lead.company || '—'}</div>
+              </div>
+              <div style={{marginLeft:'auto'}}><StatusBadge status={lead.status} /></div>
+            </div>
+            <div className="card-body">
+              <div className="info-row">
+                <div className="info-item"><div className="info-key">Email</div><div className="info-val">{lead.email}</div></div>
+                <div className="info-item"><div className="info-key">Phone</div><div className="info-val">{lead.phone||'—'}</div></div>
+              </div>
+              <div className="info-row">
+                <div className="info-item"><div className="info-key">Source</div><div className="info-val">{lead.source}</div></div>
+                <div className="info-item"><div className="info-key">Added On</div><div className="info-val">{fmtDate(lead.createdAt)}</div></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Notes Card */}
+          <div className="card">
+            <div className="card-head">
+              <span className="card-title">📝 Notes & Follow-ups</span>
+              <span style={{fontSize:12,color:'var(--text3)'}}>{(lead.notes||[]).length} note{(lead.notes||[]).length!==1?'s':''}</span>
+            </div>
+            <div className="card-body">
+              {(lead.notes||[]).length === 0 && (
+                <div style={{color:'var(--text3)',fontSize:13,marginBottom:14}}>No notes yet. Add your first one below.</div>
+              )}
+              <div className="notes-list">
+                {(lead.notes||[]).map(n => (
+                  <div className="note-item" key={n.id}>
+                    <div className="note-text">{n.text}</div>
+                    <div className="note-meta">
+                      <span>🕐 {fmtTime(n.createdAt)}</span>
+                      <button onClick={()=>deleteNote(n.id)} style={{background:'none',border:'none',color:'var(--red)',cursor:'pointer',fontSize:11,padding:0,marginLeft:'auto'}}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="note-add-form">
+                <textarea
+                  placeholder="Add a note or follow-up reminder..."
+                  value={noteText}
+                  onChange={e=>setNoteText(e.target.value)}
+                  onKeyDown={e=>{if(e.key==='Enter'&&e.ctrlKey)addNote();}}
+                />
+                <button className="btn-note" onClick={addNote}>Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="detail-aside">
+          <div className="card">
+            <div className="card-head"><span className="card-title">⚡ Update Status</span></div>
+            <div className="card-body">
+              <div className="status-select-wrap">
+                {STATUSES.map(s => (
+                  <div key={s} className={`status-option ${s} ${lead.status===s?'active':''}`} onClick={()=>updateStatus(s)}>
+                    <span className="status-dot" style={{background: s==='new'?'var(--blue)':s==='contacted'?'var(--orange)':s==='converted'?'var(--green)':'var(--red)', width:8,height:8,borderRadius:'50%',display:'inline-block'}} />
+                    {statusLabel(s)}
+                    {lead.status===s && <span style={{marginLeft:'auto',fontSize:12}}>✓</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-head"><span className="card-title">📋 Quick Info</span></div>
+            <div className="card-body">
+              <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                <div><div className="info-key">Lead ID</div><div style={{fontSize:12,color:'var(--text2)',fontFamily:'monospace'}}>#{lead.id}</div></div>
+                <div><div className="info-key">Notes</div><div style={{fontSize:13,color:'var(--text)'}}>{(lead.notes||[]).length} note{(lead.notes||[]).length!==1?'s':''}</div></div>
+                <div><div className="info-key">Created</div><div style={{fontSize:13,color:'var(--text)'}}>{fmtDate(lead.createdAt)}</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Leads Table ──────────────────────────────────────────────────
+function LeadTable({ leads, onView, onEdit, onDelete }) {
+  if (leads.length === 0) return (
+    <div className="table-wrap">
+      <div className="empty-state">
+        <div className="empty-icon">🔍</div>
+        <div className="empty-title">No leads found</div>
+        <div className="empty-sub">Try a different filter or add a new lead.</div>
+      </div>
+    </div>
+  );
+  return (
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Source</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Added</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leads.map(l => (
+            <tr key={l.id} onClick={()=>onView(l)}>
+              <td>
+                <div className="lead-name">{l.name}</div>
+                <div className="lead-email">{l.email}</div>
+                {l.company && <div style={{fontSize:11,color:'var(--text3)',marginTop:1}}>{l.company}</div>}
+              </td>
+              <td><span className="source-badge">{l.source}</span></td>
+              <td><StatusBadge status={l.status} /></td>
+              <td><span style={{fontSize:12,color:'var(--text3)'}}>{(l.notes||[]).length} note{(l.notes||[]).length!==1?'s':''}</span></td>
+              <td><span className="date-text">{fmtDate(l.createdAt)}</span></td>
+              <td onClick={e=>e.stopPropagation()}>
+                <div className="action-btns">
+                  <div className="icon-btn" title="View" onClick={()=>onView(l)}>👁</div>
+                  <div className="icon-btn" title="Edit" onClick={()=>onEdit(l)}>✎</div>
+                  <div className="icon-btn danger" title="Delete" onClick={()=>onDelete(l.id)}>🗑</div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Stats Bar ────────────────────────────────────────────────────
+function Stats({ leads }) {
+  const total = leads.length;
+  const byStatus = s => leads.filter(l=>l.status===s).length;
+  return (
+    <div className="stats-grid">
+      <div className="stat-card yellow">
+        <div className="stat-label">Total Leads</div>
+        <div className="stat-value">{total}</div>
+        <div className="stat-sub">All pipeline leads</div>
+      </div>
+      <div className="stat-card blue">
+        <div className="stat-label">New</div>
+        <div className="stat-value">{byStatus('new')}</div>
+        <div className="stat-sub">Awaiting contact</div>
+      </div>
+      <div className="stat-card orange">
+        <div className="stat-label">Contacted</div>
+        <div className="stat-value">{byStatus('contacted')}</div>
+        <div className="stat-sub">In conversation</div>
+      </div>
+      <div className="stat-card green">
+        <div className="stat-label">Converted</div>
+        <div className="stat-value">{byStatus('converted')}</div>
+        <div className="stat-sub">{total?Math.round(byStatus('converted')/total*100):0}% conv. rate</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main App ─────────────────────────────────────────────────────
+function App() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('crm_auth') === '1');
+  const [leads, setLeads] = useState(loadLeads);
+  const [view, setView] = useState('leads'); // 'leads' | 'detail'
+  const [activeLead, setActiveLead] = useState(null);
+  const [modal, setModal] = useState(null); // null | {mode:'add'} | {mode:'edit', lead}
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const { toasts, push } = useToast();
+
+  function persist(updated) { setLeads(updated); saveLeads(updated); }
+
+  function addLead(form) {
+    const nl = { ...form, id: uid(), notes: [], createdAt: new Date().toISOString() };
+    persist([nl, ...leads]);
+    setModal(null);
+    push('Lead added successfully', 'success');
+  }
+  function editLead(form) {
+    persist(leads.map(l => l.id === form.id ? {...l,...form} : l));
+    setModal(null);
+    push('Lead updated', 'success');
+  }
+  function deleteLead(id) {
+    if (view === 'leads' && !confirm('Delete this lead?')) return;
+    persist(leads.filter(l => l.id !== id));
+    push('Lead deleted', 'error');
+  }
+  function updateLead(updated) {
+    const next = leads.map(l => l.id === updated.id ? updated : l);
+    persist(next);
+    if (activeLead?.id === updated.id) setActiveLead(updated);
+  }
+  function viewLead(l) { setActiveLead(l); setView('detail'); }
+
+  function handleLogin() { sessionStorage.setItem('crm_auth','1'); setAuthed(true); }
+  function handleLogout() { sessionStorage.removeItem('crm_auth'); setAuthed(false); }
+
+  const filtered = leads.filter(l => {
+    const q = search.toLowerCase();
+    const matchQ = !q || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || (l.company||'').toLowerCase().includes(q);
+    const matchF = filter === 'all' || l.status === filter;
+    return matchQ && matchF;
+  });
+
+  const counts = s => leads.filter(l=>l.status===s).length;
+
+  if (!authed) return <Login onLogin={handleLogin} />;
+
+  return (
+    <div className="app-layout">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">⚡</div>
+          <span className="sidebar-logo-text">LeadFlow</span>
+        </div>
+        <div className="sidebar-section">Main</div>
+        <div className={`nav-item ${view==='leads'?'active':''}`} onClick={()=>{setView('leads');setActiveLead(null);}}>
+          <span className="nav-item-icon">📋</span> All Leads
+          <span className="nav-badge">{leads.length}</span>
+        </div>
+        <div className="sidebar-section">Pipeline</div>
+        {STATUSES.map(s => (
+          <div key={s} className="nav-item" onClick={()=>{setView('leads');setActiveLead(null);setFilter(s);}}>
+            <span className="nav-item-icon">{s==='new'?'🔵':s==='contacted'?'🟠':s==='converted'?'🟢':'🔴'}</span>
+            {statusLabel(s)}
+            <span className="nav-badge" style={{background:'var(--surface3)',color:'var(--text2)'}}>{counts(s)}</span>
+          </div>
+        ))}
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-avatar">A</div>
+            <div>
+              <div className="sidebar-username">{USER.name}</div>
+              <div className="sidebar-role">{USER.role}</div>
+            </div>
+            <button className="logout-btn" title="Logout" onClick={handleLogout}>⏏</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="main">
+        <div className="topbar">
+          <div className="topbar-title">
+            {view === 'detail' && activeLead ? activeLead.name : 'Lead Management'}
+          </div>
+          {view === 'leads' && (
+            <>
+              <div className="search-wrap">
+                <span className="search-icon">🔍</span>
+                <input className="topbar-search" placeholder="Search leads…" value={search} onChange={e=>setSearch(e.target.value)} />
+              </div>
+              <button className="btn-add" onClick={()=>setModal({mode:'add'})}>
+                <span>+</span> Add Lead
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="content">
+          {view === 'leads' && (
+            <>
+              <Stats leads={leads} />
+              <div className="filter-bar">
+                {['all',...STATUSES].map(f => (
+                  <button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>setFilter(f)}>
+                    {f==='all'?'All Leads':statusLabel(f)}
+                    <span className="filter-count">{f==='all'?leads.length:counts(f)}</span>
+                  </button>
+                ))}
+              </div>
+              <LeadTable
+                leads={filtered}
+                onView={viewLead}
+                onEdit={l=>setModal({mode:'edit',lead:l})}
+                onDelete={deleteLead}
+              />
+            </>
+          )}
+          {view === 'detail' && activeLead && (
+            <LeadDetail
+              lead={activeLead}
+              onUpdate={updateLead}
+              onBack={()=>{setView('leads');setActiveLead(null);}}
+              onDelete={deleteLead}
+              push={push}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Modals */}
+      {modal?.mode === 'add' && <LeadModal onSave={addLead} onClose={()=>setModal(null)} />}
+      {modal?.mode === 'edit' && <LeadModal lead={modal.lead} onSave={form=>editLead({...modal.lead,...form})} onClose={()=>setModal(null)} />}
+
+      {/* Toasts */}
+      <Toast toasts={toasts} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<!-- ============================================================
+     FULL PROJECT STRUCTURE & SETUP GUIDE
+     (Read in browser console or view source)
+     ============================================================
+
+PROJECT FOLDER STRUCTURE
+========================
+leadflow-crm/
+├── backend/
+│   ├── config/
+│   │   └── db.js              # MongoDB connection
+│   ├── middleware/
+│   │   └── auth.js            # JWT auth middleware
+│   ├── models/
+│   │   └── Lead.js            # Mongoose schema
+│   ├── routes/
+│   │   └── leads.js           # CRUD API routes
+│   ├── .env                   # Environment variables
+│   ├── server.js              # Express entry point
+│   └── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── LeadTable.jsx
+│   │   │   ├── LeadModal.jsx
+│   │   │   └── LeadDetail.jsx
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── package.json
+└── README.md
+
+DATABASE SCHEMA (MongoDB / Mongoose)
+=====================================
+const LeadSchema = new mongoose.Schema({
+  name:      { type: String, required: true },
+  email:     { type: String, required: true, unique: true },
+  phone:     { type: String },
+  company:   { type: String },
+  source:    { type: String, enum: ['Website Form','Referral','Cold Email','LinkedIn','Twitter','Walk-in','Other'] },
+  status:    { type: String, enum: ['new','contacted','converted','lost'], default: 'new' },
+  notes:     [{ text: String, createdAt: { type: Date, default: Date.now } }],
+}, { timestamps: true });
+
+BACKEND API ROUTES (Express)
+==============================
+POST   /api/auth/login        → returns JWT token
+GET    /api/leads             → list all leads (auth required)
+POST   /api/leads             → create lead (auth required)
+GET    /api/leads/:id         → get single lead (auth required)
+PUT    /api/leads/:id         → update lead (auth required)
+DELETE /api/leads/:id         → delete lead (auth required)
+POST   /api/leads/:id/notes   → add note to lead (auth required)
+DELETE /api/leads/:id/notes/:noteId → delete note (auth required)
+
+SETUP INSTRUCTIONS
+==================
+1. Clone / create the project folder:
+   mkdir leadflow-crm && cd leadflow-crm
+
+2. Backend setup:
+   cd backend
+   npm init -y
+   npm install express mongoose dotenv bcryptjs jsonwebtoken cors
+
+3. Create backend/.env:
+   MONGO_URI=mongodb://localhost:27017/leadflow
+   JWT_SECRET=your_jwt_secret_here
+   PORT=5000
+
+4. Start MongoDB (local) or use MongoDB Atlas free tier
+
+5. Run backend:
+   node server.js
+
+6. Frontend setup:
+   cd ../frontend
+   npm create vite@latest . -- --template react
+   npm install axios react-router-dom
+
+7. Update frontend API base URL to http://localhost:5000
+
+8. Run frontend:
+   npm run dev
+
+9. Open http://localhost:5173
+
+GITHUB HOSTING
+==============
+git init
+git add .
+git commit -m "Initial LeadFlow CRM"
+gh repo create leadflow-crm --public --push
+
+-->
+</body>
+</html>
